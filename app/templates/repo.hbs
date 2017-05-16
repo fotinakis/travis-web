@@ -109,7 +109,7 @@
         <a href="{{urlGithub}}" title="{{repo.name}} on GitHub" class="repo-gh">
           {{inline-svg 'icon-repooctocat'}}</a>
         <div class="repo-badge">
-          <a href="#" id="status-image-popup" title="Latest push build on default branch: {{repo.defaultBranch.lastBuild.state}}" name="status-images" class="open-popup" {{action "statusImages"}}>
+          <a href="#"  title="Latest push build on default branch: {{repo.defaultBranch.lastBuild.state}}"  {{action "toggleStatusBadgeModal"}}>
             <img src={{statusImageUrl}} alt="build:{{repo.defaultBranch.lastBuild.state}}"/>
           </a>
         </div>
@@ -132,7 +132,14 @@
 {{/if}}
 {{/repo-wrapper}}
 
-{{status-images repo=repo}}
+{{#if isShowingStatusBadgeModal}}
+  {{#modal-dialog
+     onClose="toggleStatusBadgeModal"
+     targetAttachment="center"
+     translucentOverlay=true}}
+    {{status-images repo=repo}}
+  {{/modal-dialog}}
+{{/if}}
 
 {{#if isShowingTriggerBuildModal}}
   {{#modal-dialog

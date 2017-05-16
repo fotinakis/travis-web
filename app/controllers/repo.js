@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import eventually from 'travis/utils/eventually';
 import Visibility from 'npm:visibilityjs';
+import config from 'travis/config/environment';
 
 const { service, controller } = Ember.inject;
 const { alias } = Ember.computed;
@@ -25,6 +26,7 @@ export default Ember.Controller.extend({
   job: Ember.computed.alias('jobController.job'),
 
   isShowingTriggerBuildModal: false,
+  isShowingStatusBadgeModal: false,
 
   reset() {
     this.set('repo', null);
@@ -47,45 +49,36 @@ export default Ember.Controller.extend({
 
   // @TODO fix this copy pasta :/
   branches: Ember.computed('popupName', 'repo', function () {
-    let repoId = this.get('repo.id'),
-      popupName = this.get('popupName');
+    let repoId = this.get('repo.id');
 
-    if (popupName === 'trigger-custom-build') {
-      let array = Ember.ArrayProxy.create({ content: [] }),
-        apiEndpoint = Config.apiEndpoint,
-        options = {
-          headers: {
-            'Travis-API-Version': '3'
-          }
-        };
-
-      if (this.get('auth.signedIn')) {
-        options.headers.Authorization = `token ${this.auth.token()}`;
-      }
-
-      let url = `${apiEndpoint}/repo/${repoId}/branches?limit=100`;
-      Ember.$.ajax(url, options).then(response => {
-        if (response.branches.length) {
-          let branchNames = response.branches.map(branch => branch.name);
-          array.pushObjects(branchNames);
-        } else {
-          array.pushObject('master');
+    let array = Ember.ArrayProxy.create({ content: [] }),
+      apiEndpoint = config.apiEndpoint,
+      options = {
+        headers: {
+          'Travis-API-Version': '3'
         }
+      };
 
-        this.get('isLoadingBranches', false);
-      });
-
-      return array;
-    } else {
-      // if status images popup is not open, don't fetch any branches
-      return [];
+    if (this.get('auth.signedIn')) {
+      options.headers.Authorization = `token ${this.auth.token()}`;
     }
+
+    let url = `${apiEndpoint}/repo/${repoId}/branches?limit=100`;
+    Ember.$.ajax(url, options).then(response => {
+      if (response.branches.length) {
+        let branchNames = response.branches.map(branch => branch.name);
+        array.pushObjects(branchNames);
+      } else {
+        array.pushObject('master');
+      }
+    });
+
+    return array;
   }),
 
   actions: {
-    statusImages() {
-      this.get('popup').open('status-images');
-      return false;
+    toggleStatusBadgeModal() {
+      this.toggleProperty('isShowingStatusBadgeModal');
     },
     toggleTriggerBuildModal() {
       this.toggleProperty('isShowingTriggerBuildModal');
