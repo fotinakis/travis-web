@@ -24,6 +24,8 @@ export default Ember.Controller.extend({
   builds: Ember.computed.alias('buildsController.content'),
   job: Ember.computed.alias('jobController.job'),
 
+  isShowingTriggerBuildModal: false,
+
   reset() {
     this.set('repo', null);
   },
@@ -43,6 +45,7 @@ export default Ember.Controller.extend({
     return this.get('repo.currentBuild.id') && this.get('repo.active');
   }),
 
+  // @TODO fix this copy pasta :/
   branches: Ember.computed('popupName', 'repo', function () {
     let repoId = this.get('repo.id'),
       popupName = this.get('popupName');
@@ -55,8 +58,6 @@ export default Ember.Controller.extend({
             'Travis-API-Version': '3'
           }
         };
-
-      array.set('isLoaded', false);
 
       if (this.get('auth.signedIn')) {
         options.headers.Authorization = `token ${this.auth.token()}`;
@@ -71,7 +72,7 @@ export default Ember.Controller.extend({
           array.pushObject('master');
         }
 
-        array.set('isLoaded', true);
+        this.get('isLoadingBranches', false);
       });
 
       return array;
@@ -86,10 +87,8 @@ export default Ember.Controller.extend({
       this.get('popup').open('status-images');
       return false;
     },
-    triggerCustomBuild() {
-      console.log('heya');
-      this.get('popup').open('trigger-custom-build');
-      return false;
+    toggleTriggerBuildModal() {
+      this.toggleProperty('isShowingTriggerBuildModal');
     }
   },
 
