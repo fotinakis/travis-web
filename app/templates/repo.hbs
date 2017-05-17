@@ -146,6 +146,6 @@
      onClose="toggleTriggerBuildModal"
      targetAttachment="center"
      translucentOverlay=true}}
-    {{trigger-custom-build repo=repo}}
+    {{trigger-custom-build repo=repo onClose=(action 'toggleTriggerBuildModal')}}
   {{/modal-dialog}}
 {{/if}}

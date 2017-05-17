@@ -5,6 +5,7 @@ const { service } = Ember.inject;
 
 export default Ember.Component.extend({
   ajax: service(),
+  flashes: service(),
 
   triggerBuildMessage: '',
   triggerBuildConfig: '',
@@ -28,6 +29,11 @@ export default Ember.Component.extend({
 
     return this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
       .then(() => {
+        this.get('flashes').success('We received the request, your build is being created');
+        this.get('onClose')();
+      }, () => {
+        this.get('flashes').error('There was an error with the build requets, it did not get through');
+        this.get('onClose')();
       });
   },
 
