@@ -23,6 +23,10 @@
   <p class="form-helptext">The config needs to be entered in '' format</p>
 </div>
 
-<div class="form-elem">
-  <button {{action 'triggerCustomBuild'}} type="button" class="form-submit" title="Trigger custom build with your settings">Trigger custom build</button>
-</div>
+{{#if sendTriggerrequest.isRunning}}
+  {{loading-indicator}}
+{{else}}
+  <div class="form-elem">
+    <button {{action 'triggerCustomBuild'}} type="button" class="form-submit" title="Trigger custom build with your settings">Trigger custom build</button>
+  </div>
+{{/if}}

@@ -1,5 +1,5 @@
 import Ember from 'ember';
-// import { task } from 'ember-concurrency';
+import { task } from 'ember-concurrency';
 
 const { service } = Ember.inject;
 
@@ -11,7 +11,7 @@ export default Ember.Component.extend({
   triggerBuildConfig: '',
   triggerBuildBranch: '',
 
-  sendTriggerRequest() {
+  sendTriggerRequest: task(function* () {
     let body = {};
     body.request = {};
 
@@ -27,19 +27,23 @@ export default Ember.Component.extend({
 
     body.request = JSON.stringify(body.request);
 
-    return this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
-      .then(() => {
-        this.get('flashes').success('We received the request, your build is being created');
-        this.get('onClose')();
-      }, () => {
-        this.get('flashes').error('There was an error with the build requets, it did not get through');
-        this.get('onClose')();
-      });
-  },
+    try {
+      yield this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
+        .then(() => {
+          this.get('flashes')
+            .success('We received the request, your build is being created');
+          this.get('onClose')();
+        });
+    } catch (e) {
+      this.get('flashes')
+        .error('There was an error with the build requets, it did not get through');
+      this.get('onClose')();
+    }
+  }),
 
   actions: {
     triggerCustomBuild() {
-      this.sendTriggerRequest();
+      this.get('sendTriggerRequest').perform();
     }
   }
 });
