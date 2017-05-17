@@ -20,10 +20,8 @@ export default Ember.Component.extend({
     };
     body = JSON.stringify(body);
 
-    console.log(body);
-    return this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, {})
+    return this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
       .then(() => {
-        console.log('lol');
       });
   },
 
