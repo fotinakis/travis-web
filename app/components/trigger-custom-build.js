@@ -11,20 +11,19 @@ export default Ember.Component.extend({
   triggerBuildBranch: '',
 
   sendTriggerRequest() {
-    let body = {
-      request: {
-        message: this.get('triggerBuildMessage'),
-        branch: this.get('triggerBuildBranch'),
-        config: JSON.stringify(this.get('triggerBuildConfig'))
-      }
+    let body = {};
+    body.request = {
+      message: this.get('triggerBuildMessage'),
+      branch: this.get('triggerBuildBranch'),
+      config: this.get('triggerBuildConfig')
     };
-    body = JSON.stringify(body);
+
+    body.request = JSON.stringify(body.request);
 
     return this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
       .then(() => {
       });
   },
-
 
   actions: {
     triggerCustomBuild() {
