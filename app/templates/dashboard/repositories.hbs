@@ -27,6 +27,17 @@
           {{no-repos}}
         {{/each}}
       </ul>
+
+      {{model.repos.meta.pagination.count}}
+
+      {{#unless model.repos.meta.pagination.is_first}}
+        {{#link-to 'dashboard.repositories' (query-params offset=model.repos.meta.pagination.prev.offset) }}prevous{{/link-to}}
+      {{/unless}}
+
+      {{#unless model.repos.meta.pagination.is_last}}
+        {{#link-to 'dashboard.repositories' (query-params offset=model.repos.meta.pagination.next.offset) }}next{{/link-to}}
+      {{/unless}}
+      Pagination
     </section>
 
     <!-- <section class="dashboard-section dashboard-inactive">
