@@ -22,8 +22,7 @@ test('it renders list of pages', function (assert) {
   this.set('pagination', pagination);
   this.render(hbs`{{pagination-navigation pagination=pagination route="someroute"}}`);
 
-  assert.equal(this.$().find('li.pagination-button').count, 1, 'on the first page should have one navigation button');
-  assert.equal(this.$().find('li.pagination-button').text(), 'next', 'should have a next button on the first page');
-
-  assert.equal(this.$().find('li').count, 7, 'should calculate correct page count plus button');
+  assert.equal(this.$().find('a.pagination-button').length, 1, 'on the first page should have one navigation button');
+  assert.equal(this.$().find('a.pagination-button').text(), 'next', 'should have a next button on the first page');
+  assert.equal(this.$().find('a.pagination-link').length, 7, 'should calculate correct page count');
 });
