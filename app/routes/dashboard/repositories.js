@@ -19,16 +19,13 @@ export default TravisRoute.extend({
   },
 
   model(params) {
-    let collection = PaginatedCollectionPromise.create({
-      content: this.store.query('repo', {
+    return Ember.RSVP.hash({
+      repos: this.store.paginated('repo', {
         active: true,
         withLastBuild: true,
-        sort_by: 'last_build.finished_at:desc',
+        sortBy: 'last_build.finished_at:desc',
         offset: params.offset
       }),
-    });
-    return Ember.RSVP.hash({
-      repos: collection,
       accounts: this.store.query('account', {
         all: true
       })
