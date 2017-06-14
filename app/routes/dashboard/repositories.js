@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import TravisRoute from 'travis/routes/basic';
-import PaginatedCollectionPromise from 'travis/utils/paginated-collection-promise';
 
 export default TravisRoute.extend({
   queryParams: {

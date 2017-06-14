@@ -17,7 +17,7 @@ export default DS.Store.extend({
 
   paginated() {
     return PaginatedCollectionPromise.create({
-     content: this.query(...arguments)
+      content: this.query(...arguments)
     });
   },
 
