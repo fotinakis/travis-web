@@ -23,7 +23,8 @@ export default TravisRoute.extend({
         active: true,
         withLastBuild: true,
         sortBy: 'last_build.finished_at:desc',
-        offset: params.offset
+        offset: params.offset,
+        limit: 5
       }),
       accounts: this.store.query('account', {
         all: true
