@@ -6,8 +6,12 @@ export default Ember.Component.extend({
   classNames: ['pagination-navigation'],
   @alias('collection.pagination') pagination: null,
 
-  outerWindow: 1,
-  innerWindow: 4,
+  outerWindow: Ember.computed('outer', function () {
+    return this.get('outer') || 1;
+  }),
+  innerWindow: Ember.computed('inner', function () {
+    return this.get('inner') || 2;
+  }),
 
   currentPage: Ember.computed('pagination.offset', 'pagination.perPage', function () {
     return (this.get('pagination.offset') / this.get('pagination.perPage') + 1);
