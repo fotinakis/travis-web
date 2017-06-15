@@ -7,7 +7,7 @@ export default Ember.Component.extend({
   @alias('collection.pagination') pagination: null,
 
   outerWindow: 1,
-  innerWindow: 2,
+  innerWindow: 4,
 
   currentPage: Ember.computed('pagination.offset', 'pagination.perPage', function() {
     return (this.get('pagination.offset') / this.get('pagination.perPage') + 1);
@@ -47,8 +47,13 @@ export default Ember.Component.extend({
         });
       }
 
-
       let innerHalf = Math.ceil(this.get('innerWindow') / 2);
+
+      // ... devider unit
+      if ((this.get('currentPage') - innerHalf) - pageArray.length > 1) {
+        pageArray.push({ offset: 'first'});
+      }
+
       // innerwindow < current page
       for (let i = (this.get('currentPage') - innerHalf); i < this.get('currentPage'); i++) {
         pageArray.push({
@@ -71,6 +76,11 @@ export default Ember.Component.extend({
         });
       }
 
+      // ... devider unit
+      if ((num - this.get('outerWindow')) - (this.get('currentPage') + innerHalf)  > 1) {
+        pageArray.push({ offset: 'last'});
+      }
+
       // outerwindow last page
       for (let i = (this.get('numberOfPages') - this.get('outerWindow')); i < this.get('numberOfPages'); i++) {
         pageArray.push({
@@ -84,6 +94,7 @@ export default Ember.Component.extend({
         num: this.get('numberOfPages'),
         offset: this.get('pagination.last.offset')
       });
+
     }
     return pageArray;
   })
