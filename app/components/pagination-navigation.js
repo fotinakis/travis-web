@@ -47,7 +47,7 @@ export default Ember.Component.extend({
       }
       let upperInnerBoundary = currentPage + innerHalf;
       let lowerOuterBoundary = 1 + outerWindow;
-      let upperOuterBoundary = numberOfPages - outerWindow ;
+      let upperOuterBoundary = numberOfPages - outerWindow;
 
       pageArray.push({
         num: 1,
