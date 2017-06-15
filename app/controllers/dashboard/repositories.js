@@ -104,8 +104,6 @@ export default Ember.Controller.extend({
       return repos;
     }),
 
-  starredRepos: Ember.computed.filterBy('filteredRepos', 'starred'),
-
   selectedOrg: Ember.computed('account', function () {
     let accounts = this.get('model.accounts');
     let filter =  this.get('account');
