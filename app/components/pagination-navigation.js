@@ -7,7 +7,7 @@ export default Ember.Component.extend({
   @alias('collection.pagination') pagination: null,
 
   outerWindow: 1,
-  innerWindow: 2,
+  innerWindow: 4,
 
   currentPage: Ember.computed('pagination.offset', 'pagination.perPage', function () {
     return (this.get('pagination.offset') / this.get('pagination.perPage') + 1);
@@ -38,6 +38,9 @@ export default Ember.Component.extend({
       let outerWindow = this.get('outerWindow');
       let innerHalf = Math.ceil(innerWindow / 2);
       let lowerInnerBoundary = currentPage - innerHalf;
+      if (lowerInnerBoundary < 0) {
+        lowerInnerBoundary = 0;
+      }
       let upperInnerBoundary = currentPage + innerHalf;
       let lowerOuterBoundary = 1 + outerWindow;
       let upperOuterBoundary = numberOfPages - outerWindow ;
@@ -48,37 +51,46 @@ export default Ember.Component.extend({
       });
       // outerwindow first page
       for (let i = 1; i <= outerWindow; i++) {
-        pageArray.push({
-          num: 1 + i,
-          offset: this.get('pagination.perPage') * i
-        });
+        if (i !== currentPage) {
+          pageArray.push({
+            num: 1 + i,
+            offset: this.get('pagination.perPage') * i
+          });
+        }
       }
 
       // ... devider unit
-      if (lowerInnerBoundary - pageArray.length > 1) {
+      if (lowerInnerBoundary - pageArray.length > outerWindow) {
         pageArray.push({});
       }
 
       // innerwindow < current page
       for (let i = lowerInnerBoundary; i < currentPage; i++) {
+        if (i > lowerOuterBoundary) {
+          pageArray.push({
+            num: i,
+            offset: (this.get('pagination.perPage') * (i - 1))
+          });
+        }
+      }
+
+      if (currentPage > lowerOuterBoundary &&
+         currentPage < upperOuterBoundary) {
+        // current page
         pageArray.push({
-          num: i,
-          offset: (this.get('pagination.perPage') * (i - 1))
+          num: currentPage,
+          offset: currentOffset
         });
       }
 
-      // current page
-      pageArray.push({
-        num: currentPage,
-        offset: currentOffset
-      });
-
       // innerwindow > current page
       for (let i = currentPage + 1; i <= upperInnerBoundary; i++) {
-        pageArray.push({
-          num: i,
-          offset: (this.get('pagination.perPage') * (i - 1))
-        });
+        if (i < upperOuterBoundary) {
+          pageArray.push({
+            num: i,
+            offset: (this.get('pagination.perPage') * (i - 1))
+          });
+        }
       }
 
       // ... devider unit
@@ -88,10 +100,12 @@ export default Ember.Component.extend({
 
       // outerwindow last page
       for (let i = upperOuterBoundary; i < numberOfPages; i++) {
-        pageArray.push({
-          num: i,
-          offset: (this.get('pagination.perPage') * (i - 1))
-        });
+        if (!(i < currentPage)) {
+          pageArray.push({
+            num: i,
+            offset: (this.get('pagination.perPage') * (i - 1))
+          });
+        }
       }
 
       pageArray.push({
