@@ -7,9 +7,9 @@ export default Ember.Component.extend({
   @alias('collection.pagination') pagination: null,
 
   outerWindow: 1,
-  innerWindow: 4,
+  innerWindow: 2,
 
-  currentPage: Ember.computed('pagination.offset', 'pagination.perPage', function() {
+  currentPage: Ember.computed('pagination.offset', 'pagination.perPage', function () {
     return (this.get('pagination.offset') / this.get('pagination.perPage') + 1);
   }),
 
@@ -18,44 +18,49 @@ export default Ember.Component.extend({
   }),
 
   pages: Ember.computed('numberOfPages', function () {
-    let num = this.get('numberOfPages');
+    let numberOfPages = this.get('numberOfPages');
+    let thresholdDisplayAll = ((this.get('outerWindow') + 1) * 2) + (this.get('innerWindow') + 1);
     let pageArray = [];
 
     // display all pages if there is only a few
-    if (num < this.get('outerWindow') + (this.get('innerWindow') * 2)) {
-      for (let i = 0; i < num; i++) {
+    if (numberOfPages <= thresholdDisplayAll) {
+      for (let i = 0; i < numberOfPages; i++) {
         pageArray.push({
           num: i + 1,
           offset: this.get('pagination.perPage') * i
         });
       }
-
     // else stack together pagination
     } else {
+      let currentPage = this.get('currentPage');
+      let currentOffset = this.get('pagination.offset');
+      let innerWindow = this.get('innerWindow');
+      let outerWindow = this.get('outerWindow');
+      let innerHalf = Math.ceil(innerWindow / 2);
+      let lowerInnerBoundary = currentPage - innerHalf;
+      let upperInnerBoundary = currentPage + innerHalf;
+      let lowerOuterBoundary = 1 + outerWindow;
+      let upperOuterBoundary = numberOfPages - outerWindow ;
 
-      // first page
       pageArray.push({
         num: 1,
-        offset: this.get('pagination.first.offset')
+        offset: 0
       });
-
       // outerwindow first page
-      for (let i = 1; i <= this.get('outerWindow'); i++) {
+      for (let i = 1; i <= outerWindow; i++) {
         pageArray.push({
           num: 1 + i,
-          offset: this.get('pagination.first.offset') + (this.get('pagination.perPage') * i)
+          offset: this.get('pagination.perPage') * i
         });
       }
 
-      let innerHalf = Math.ceil(this.get('innerWindow') / 2);
-
       // ... devider unit
-      if ((this.get('currentPage') - innerHalf) - pageArray.length > 1) {
-        pageArray.push({ offset: 'first'});
+      if (lowerInnerBoundary - pageArray.length > 1) {
+        pageArray.push({});
       }
 
       // innerwindow < current page
-      for (let i = (this.get('currentPage') - innerHalf); i < this.get('currentPage'); i++) {
+      for (let i = lowerInnerBoundary; i < currentPage; i++) {
         pageArray.push({
           num: i,
           offset: (this.get('pagination.perPage') * (i - 1))
@@ -64,12 +69,12 @@ export default Ember.Component.extend({
 
       // current page
       pageArray.push({
-        num: this.get('currentPage'),
-        offset: this.get('pagination.offset')
+        num: currentPage,
+        offset: currentOffset
       });
 
       // innerwindow > current page
-      for (let i = (this.get('currentPage')) + 1; i <= this.get('currentPage') + innerHalf; i++) {
+      for (let i = currentPage + 1; i <= upperInnerBoundary; i++) {
         pageArray.push({
           num: i,
           offset: (this.get('pagination.perPage') * (i - 1))
@@ -77,24 +82,22 @@ export default Ember.Component.extend({
       }
 
       // ... devider unit
-      if ((num - this.get('outerWindow')) - (this.get('currentPage') + innerHalf)  > 1) {
-        pageArray.push({ offset: 'last'});
+      if (upperOuterBoundary - upperInnerBoundary  > 1) {
+        pageArray.push({});
       }
 
       // outerwindow last page
-      for (let i = (this.get('numberOfPages') - this.get('outerWindow')); i < this.get('numberOfPages'); i++) {
+      for (let i = upperOuterBoundary; i < numberOfPages; i++) {
         pageArray.push({
           num: i,
           offset: (this.get('pagination.perPage') * (i - 1))
         });
       }
 
-      // last page
       pageArray.push({
-        num: this.get('numberOfPages'),
+        num: numberOfPages,
         offset: this.get('pagination.last.offset')
       });
-
     }
     return pageArray;
   })
