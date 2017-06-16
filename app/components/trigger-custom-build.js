@@ -12,18 +12,11 @@ export default Ember.Component.extend({
   triggerBuildBranch: '',
 
   sendTriggerRequest: task(function* () {
-    let body = {};
-    body.request = {};
-    if (this.get('triggerBuildMessage') !== '') {
-      body.request.message = this.get('triggerBuildMessage');
-    }
-    if (this.get('triggerBuildConfig') !== '') {
-      body.request.config = this.get('triggerBuildConfig');
-    }
-    if (this.get('triggerBuildBranch') !== '') {
-      body.request.branch = this.get('triggerBuildBranch');
-    }
-    body.request = JSON.stringify(body.request);
+    let body = {
+      request: {
+        branch: this.get('triggerBuildBranch')
+      }
+    };
 
     try {
       yield this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
@@ -34,7 +27,8 @@ export default Ember.Component.extend({
           let reqId = data.request.id;
           Ember.run.later(this, function () {
             this.get('ajax')
-              .ajax(`/repo/${this.get('repo.id')}/request/${reqId}`, 'GET', { headers: { 'Travis-API-Version': '3' } })
+              .ajax(`/repo/${this.get('repo.id')}/request/${reqId}`, 'GET',
+                    { headers: { 'Travis-API-Version': '3' } })
               .then((data) => {
                 let reqResult = data.result;
 
@@ -43,9 +37,9 @@ export default Ember.Component.extend({
                     .success(`Your request was ${reqResult}.`);
                 } else {
                   this.get('flashes')
-                    .warning(`Your request was ${reqResult}.`);
+                    .error(`Your request was ${reqResult}.`);
                 }
-              })
+              });
           },  1000);
 
           this.get('onClose')();
