@@ -44,6 +44,9 @@ export default Ember.Component.extend({
   actions: {
     triggerCustomBuild() {
       this.get('sendTriggerRequest').perform();
+    },
+    toggleTriggerBuildModal() {
+      this.get('onClose')();
     }
   }
 });

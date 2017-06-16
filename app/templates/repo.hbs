@@ -59,7 +59,7 @@
      onClose="toggleStatusBadgeModal"
      targetAttachment="center"
      translucentOverlay=true}}
-    {{status-images repo=repo}}
+    {{status-images repo=repo onClose=(action 'toggleStatusBadgeModal')}}
   {{/modal-dialog}}
 {{/if}}
 
