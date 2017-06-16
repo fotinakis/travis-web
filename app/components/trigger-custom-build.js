@@ -14,7 +14,6 @@ export default Ember.Component.extend({
   sendTriggerRequest: task(function* () {
     let body = {};
     body.request = {};
-
     if (this.get('triggerBuildMessage') !== '') {
       body.request.message = this.get('triggerBuildMessage');
     }
@@ -24,14 +23,31 @@ export default Ember.Component.extend({
     if (this.get('triggerBuildBranch') !== '') {
       body.request.branch = this.get('triggerBuildBranch');
     }
-
     body.request = JSON.stringify(body.request);
 
     try {
       yield this.get('ajax').postV3(`/repo/${this.get('repo.id')}/requests`, body)
-        .then(() => {
+        .then((data) => {
           this.get('flashes')
-            .success('We received the request, your build is being created');
+            .success('You triggered a build! We\'re waiting to see if the request got through.');
+
+          let reqId = data.request.id;
+          Ember.run.later(this, function () {
+            this.get('ajax')
+              .ajax(`/repo/${this.get('repo.id')}/request/${reqId}`, 'GET', { headers: { 'Travis-API-Version': '3' } })
+              .then((data) => {
+                let reqResult = data.result;
+
+                if (reqResult === 'approved') {
+                  this.get('flashes')
+                    .success(`Your request was ${reqResult}.`);
+                } else {
+                  this.get('flashes')
+                    .warning(`Your request was ${reqResult}.`);
+                }
+              })
+          },  1000);
+
           this.get('onClose')();
         });
     } catch (e) {
